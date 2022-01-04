@@ -1,77 +1,62 @@
-def make_path(i,end,lst,lst2):
-    nodes=lst[i]
-    for j in range(len(nodes)):
-        if nodes[j][1] not in lst2:
-            lst2.append(nodes[j][1])
-            lst2=make_path(nodes[j][1],end,lst,lst2)
-    return lst2
+class Node:
+    def __init__(self, value):
+        self.value = value
 
-def find_path(start,end,graph):
-    if start!=end: 
-        lst=dict()
-        for i in range(len(graph)):
-            for j in range(len(graph)):
-                if graph[i][j]==1:
-                    if i not in lst.keys():
-                        lst[i]=[[i,j]]
-                    else:
-                        lst[i].append([i,j])
-        print(lst)
-        lst3=list()
-        for i in range(len(lst[start])):
-            lst2=list()
-            lst2.append(start)
-            lst2=make_path(lst[start][i][1],end,lst,lst2)
-            lst3.append(lst2)
-            print(lst2)
+class Tree:
+    def __init__(self, vertex):
+        self.vertex = vertex
+        self.adjency_list = [[] for i in range(vertex)]
 
-        # paths=lst3
-        # length=-1
-        # path=list()
-        # for i in range(len(paths)):
-        #     paths[i]=paths[i][0]
-        #     if length==-1:
-        #         length=len(paths[i])
-        #         path=paths[i]
-        #     elif length<len(paths[i]):
-        #         length=length(paths[i])
-        #         path=paths[i]
-                
-        # return path
-        return lst3
+    def add_vertex(self, src, dst):
+        if src.value and dst.value < len(self.adjency_list):
+            self.adjency_list[src.value-1].append(dst)
+            self.adjency_list[dst.value-1].append(src)
+
+    def find_path(self, src, dst):
+        # src_node_list = self.adjency_list[src.value-1]
+        visited = [False]*self.vertex    
+        path=[]
+
+        depth_first_search(src, dst, self.adjency_list, path, visited)        
+        
+def depth_first_search(src, dst, graph, path, visited):
+    visited[src.value-1]=True
+    
+    #updating path list
+    path.append(src.value)
+
+    if src.value==dst.value:
+        print(path)
     else:
-        return [start]
+        for vertex in graph[src.value-1]:
+            if not visited[vertex.value-1]:
+                depth_first_search(vertex, dst, graph, path, visited)
+
+    path.pop()
+    visited[src.value-1]=False
+
+if __name__ == '__main__':
+    t = Tree(5)
+
+    n1 = Node(1)
+    n2 = Node(2)
+    n3 = Node(3)
+    n4 = Node(4)
+    n5 = Node(5)
 
 
-def print_graph(graph):
-    n=len(graph)
-    print('   ',end='')
-    [print(f'\033[1;33;40m{x}',end="  ") for x in range(1,n+1)]
-    print('\n')
-    for i in range(1,n+1):
-        print(f'\033[1;31;40m{i}\033[1;37;40m',end="  ")
-            
-        for j in range(1,n+1):
-            print(f'{graph[i-1][j-1]}',end="  ")
-        print("\n")
+    t.add_vertex(n1, n2)
+    t.add_vertex(n1, n4)
 
-#Driver Code
-if True:
-    #Strongly Connected Graph
-    graph=[[0,0,0,1,1],
-           [1,0,0,0,0],
-           [0,0,0,1,0],
-           [0,1,1,0,0],
-           [1,0,0,0,0]]
-    #Strongly Connected Graph
-    # graph=[[0,0,0,1],
-    #        [1,0,0,0],
-    #        [0,0,0,1],
-    #        [0,1,1,0]]
-    print_graph(graph)
-    print("\033[1;37;40m")
-    start=int(input('Enter the starting vertex: '))
-    end=int(input('Enter the ending vertex: '))
-    path=find_path(start-1,end-1,graph)
-    print(f"{path}\033[0;37;40m")
+    t.add_vertex(n2, n3)
+    t.add_vertex(n2, n4)
+    t.add_vertex(n2, n5)
+
+    t.add_vertex(n3, n5)
+
+    # for i in t.adjency_list[0]:
+    #     print(i.value)
+
+    t.find_path(n1, n3)
+
 
